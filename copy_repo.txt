@@ -1,0 +1,16 @@
+# 1. Clone le dépôt existant
+git clone https://github.com/utilisateur-existant/projet-existant.git
+
+# 2. Va dans le dossier cloné
+cd projet-existant
+
+# 3. Supprime l’origine (on ne veut plus pousser sur l’ancien dépôt)
+git remote remove origin
+
+# 4. Crée un nouveau dépôt sur GitHub (via l’interface web)
+
+# 5. Ajoute le nouveau dépôt comme origine
+git remote add origin https://github.com/ton-nom-utilisateur/ton-nouveau-projet.git
+
+# 6. Pousse le contenu sur le nouveau dépôt
+git push -u origin main  # ou master, selon le nom de ta branche par défaut
