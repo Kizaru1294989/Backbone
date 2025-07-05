@@ -1,19 +1,59 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import HomeComponent from "../components/pages/Home/HomeComponent";
+import ScrollToTop from "@/components/Animation/Scroll/ScrollToTop";
+import { TransitionWrapper } from "@/components/Animation/Transition";
+import { ROUTES } from "@/const/routeconst";
+import { useLocation } from "react-router-dom";
 
-export const Router = () => {
+const getTransitionType = (pathname: string): "fade" | "wipe" | "dissolve" | "curtain" => {
+  switch (pathname) {
+    case ROUTES.HOME.PATH:
+      return "dissolve"
+    default:
+      return "dissolve"
+  }
+}
+
+const AnimatedRoutes = () => {
+  const location = useLocation()
+  const transitionType = getTransitionType(location.pathname)
+
   return (
-    <BrowserRouter>
-        <Routes>
+    <>
+        <Routes location={location} key={location.pathname}>
           <Route
-            index
-            path={"/"}
-            element={<HomeComponent />}
+            path={ROUTES.HOME.PATH}
+            element={
+              <TransitionWrapper type={transitionType}>
+                <HomeComponent />
+              </TransitionWrapper>
+            }
           />
-
         </Routes>
-    </BrowserRouter>
-  );
-};
+    </>
+  )
+}
 
-export default Router;
+const AppRoutes = () => {
+  const location = useLocation()
+  const hideHeaderRoutes = [
+
+  ]
+
+  const hideHeader = hideHeaderRoutes.includes(location.pathname)
+
+  return (
+    <>
+      <ScrollToTop />
+      <AnimatedRoutes />
+    </>
+  )
+}
+
+export const Router = () => (
+  <BrowserRouter>
+    <AppRoutes />
+  </BrowserRouter>
+)
+
+export default Router
