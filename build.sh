@@ -1,49 +1,40 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# 1) on est à la racine de backbone/
-# 2) si pas de .git, on ré-initialise et on ajoute le remote original
-if [ ! -d .git ]; then
-  echo "⚠️  Pas de dépôt Git détecté dans $(pwd)."
-  read -p "Entrez l'URL du dépôt original pour l'initialiser (ex: git@github.com:Kizaru1294989/Backbone.git) : " ORIG_REMOTE
-  git init
-  git add .
-  git commit -m "Initial commit"
-  git remote add origin "$ORIG_REMOTE"
-  echo "✅  Dépôt initialisé, remote 'origin' → $ORIG_REMOTE"
-else
-  echo "✅  .git existe, on conserve le dépôt en l'état."
+# 1. Vérifier qu'on est bien dans un dépôt Git
+if ! git rev-parse --is-inside-work-tree &>/dev/null; then
+  echo "Erreur : ce script doit être lancé à la racine d'un dépôt Git."
+  exit 1
 fi
 
-# 3) on demande l'URL du nouveau repo
-read -p "Entrez l'URL du NOUVEAU repository (ex: git@github.com:User/NewRepo.git) : " NEW_REMOTE
+# 2. Demander l'URL du nouveau repo
+read -p "URL du nouveau repository (ex: https://github.com/user/repo.git) : " NEW_REMOTE
 
-# 4) on prépare le clone dans ../<nom-du-nouveau-repo> 
+# 3. Définir le nom et le chemin du nouveau dossier
 REPO_NAME=$(basename -s .git "$NEW_REMOTE")
 PARENT_DIR=$(dirname "$PWD")
 NEW_DIR="${PARENT_DIR}/${REPO_NAME}"
 
 if [ -e "$NEW_DIR" ]; then
-  echo "❌  Le dossier cible '$NEW_DIR' existe déjà. Abandon."
+  echo "Erreur : le dossier cible '$NEW_DIR' existe déjà."
   exit 1
 fi
 
-# 5) clonage et push
-echo "➡️  Clonage de $(pwd) vers $NEW_DIR"
+# 4. Cloner le dépôt courant dans le nouveau dossier
+echo "➡️  Clonage de $(pwd) → $NEW_DIR"
 git clone "$(pwd)" "$NEW_DIR"
 
+# 5. Configurer le remote et pousser
 cd "$NEW_DIR"
-git remote remove origin
+git remote remove origin    # on supprime l'ancien remote
 git remote add origin "$NEW_REMOTE"
-echo "✅  Dans $NEW_DIR, remote 'origin' pointé vers $NEW_REMOTE"
+echo "✅  Remote 'origin' pointé vers : $NEW_REMOTE"
 
-echo "⏫  Poussée de TOUTES les branches…"
+echo "⏫  Poussée de toutes les branches…"
 git push --all origin
 
-echo "⏫  Poussée de TOUS les tags…"
+echo "⏫  Poussée de tous les tags…"
 git push --tags origin
 
 echo
-echo "🎉  Terminé !"
-echo " • Votre dossier backbone/ original contient toujours son .git et son remote origin."
-echo " • Le clone dans $NEW_DIR est configuré pour pousser vers $NEW_REMOTE."
+echo "🎉  Terminé ! Nouveau dépôt prêt dans : $NEW_DIR"
