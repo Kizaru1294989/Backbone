@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import HomeComponent from "../components/pages/Home/HomeComponent";
-import ScrollToTop from "@/components/Animation/Scroll/ScrollToTop";
+import ScrollToTop from "@/components/Scroll/ScrollToTop";
 import { TransitionWrapper } from "@/components/Animation/Transition";
 import { ROUTES } from "@/const/routeconst";
 import { useLocation } from "react-router-dom";
